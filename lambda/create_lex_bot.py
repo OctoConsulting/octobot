@@ -1,7 +1,7 @@
 import boto3
 
 def lambda_handler(event, context):
-    client = boto3.client('lex-models')
+    lex_client = boto3.client('lex-models')
     
     # TODO: split code off into functions as necessary
     
@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     for intent in event['intents']:
         # TODO: add exception handling to handle if intent already exists
         intent_names.append(event['bot_name'] + '_' + intent['name'])
-        client.put_intent(
+        lex_client.put_intent(
             name=intent_names[-1],
             sampleUtterances=intent['sample_utterances'],
             # TODO: change fulfillment activity to use LexResponder lambda function
@@ -19,20 +19,22 @@ def lambda_handler(event, context):
                 'type': 'CodeHook',
                 'codeHook': {
                     'uri': 'arn:aws:lambda:us-east-1:749091557667:function:LexResponder',
-                    'messageVersion': '$LATEST'
+                    'messageVersion': '1.0'
                 }
             },
         )
         
     # TODO: add exception handling to handle if bot already exists
     # Create bot
+    assert 'bot_name' in event
     intent_objects = []
     for intent_name in intent_names:
         intent_objects.append({
             'intentName': intent_name,
             'intentVersion': '$LATEST'
         })
-    create_bot_response = client.put_bot(
+    print(event['bot_name'])
+    create_bot_response = lex_client.put_bot(
         name=event['bot_name'],
         intents=intent_objects,
         clarificationPrompt={
