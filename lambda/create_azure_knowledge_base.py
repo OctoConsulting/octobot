@@ -1,4 +1,5 @@
 from urllib.request import Request, urlopen
+from urllib.parse import urlparse
 import json
 import boto3
 import string
@@ -57,6 +58,7 @@ def lambda_handler(event, context):
     # TODO: Check urlopen responses for success and deal with endpoint
     
     faq_url = event['url']
+    bot_name = convert_to_title(urlparse(faq_url).netloc) # netloc = base url
     
     create_response = create_knowledge_base(faq_url)
     create_response_json = json.loads(create_response)
@@ -77,14 +79,14 @@ def lambda_handler(event, context):
     
     # Generate a list of intent objects from the knowledge base
     intents = [{
-            'name': convert_to_title(question),
+            'name': convert_to_title(question)[:65],  # first 65 characters, full intent name <100 characters
             'sample_utterances': [remove_invalid_punctuation(question)],
             'response': answer
         } for question, answer, source in lines]
     
     # Assemble payload for CreateLexBot
     payload = {
-        'bot_name': convert_to_title(faq_url),
+        'bot_name': bot_name,
         'intents': intents
     }
     lambda_client = boto3.client('lambda')
@@ -96,7 +98,7 @@ def lambda_handler(event, context):
             FunctionName='CreateLexBot',
             InvocationType='RequestResponse',
             Payload=json.dumps(payload)
-            )
+        )
     except Exception as e:
         raise e
     
