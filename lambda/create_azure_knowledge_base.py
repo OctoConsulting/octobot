@@ -87,14 +87,25 @@ def lambda_handler(event, context):
         'bot_name': convert_to_title(faq_url),
         'intents': intents
     }
+    lambda_client = boto3.client('lambda')
     
     # Invoke CreateLexBot
-    lambda_client = boto3.client('lambda')
     create_lex_bot_response = ''
     try:
         create_lex_bot_response = lambda_client.invoke(
             FunctionName='CreateLexBot',
             InvocationType='RequestResponse',
+            Payload=json.dumps(payload)
+            )
+    except Exception as e:
+        raise e
+    
+    # Invoke CreateLexResponseTable
+    create_lex_response_table_response = ''
+    try:
+        create_lex_response_table_response = lambda_client.invoke(
+            FunctionName='CreateLexResponseTable',
+            InvocationType='Event',  # Event makes this request asynchronously
             Payload=json.dumps(payload)
             )
     except Exception as e:
