@@ -1,7 +1,7 @@
 import boto3
 
 lex_client = boto3.client('lex-models')
-	
+
 def create_intents(bot_name: str, intents: list) -> None:
 	"""Create Lex intents from intent objects list. All intents have the same
 	fulfillment activity code hook to the Lambda function LexResponder.
