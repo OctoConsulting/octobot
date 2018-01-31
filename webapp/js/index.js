@@ -22,12 +22,17 @@ $(document).ready(function () {
 		});
 		lambda.invoke(pullParams, function (err, data) {
 			if (err) {
-				$('#response').html(err);
+				$('#logs').html($('#logs').html() + err);
 			} else {
 				pullResults = JSON.parse(data.Payload);
-				botName = pullResults;
-				$('#logs').html($('#logs').html() + '<br>' + pullResults.trim());
-				$('#url-input').data('botName', pullResults.trim());
+				console.log(pullResults)
+				if(pullResults['succeeded']) {
+					botName = pullResults['bot_name'].trim();
+					$('#logs').html($('#logs').html() + '<br>' + botName);
+					$('#url-input').data('botName', botName);
+				} else {
+					$('#logs').html($('#logs').html() + botName['error_message']);
+				}
 			}
 		});
 	});

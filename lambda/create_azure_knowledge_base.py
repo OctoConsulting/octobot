@@ -162,11 +162,19 @@ def lambda_handler(event, context):
     faq_url = event['url']
     bot_name = bot_name_from_url(faq_url)
 
+    # Return package
+    return_package = {
+        'already_made': True,
+        'succeeded': True,
+        'bot_name': bot_name,
+        'error_message': ''
+    }
+
     # Check if bot is already there
     try:
         lex_client.get_bot(name=bot_name, versionOrAlias='DEV')
         print('Returned bot name')
-        return bot_name
+        return return_package
     except Exception as e:
         print(bot_name, 'not found')
         print('Starting pipeline...')
@@ -193,5 +201,5 @@ def lambda_handler(event, context):
     # Delete knowledge base after done with it
     delete_knowledge_base(kbId)
 
-    # TODO: give a more meaningful response
-    return bot_name
+    return_package['already_made'] = False
+    return return_package
