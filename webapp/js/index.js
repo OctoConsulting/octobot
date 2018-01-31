@@ -28,10 +28,10 @@ $(document).ready(function () {
 				console.log(pullResults)
 				if(pullResults['succeeded']) {
 					botName = pullResults['bot_name'].trim();
-					$('#logs').html($('#logs').html() + '<br>' + botName);
+					$('#logs').html($('#logs').html() + '<br>' + data.Payload);
 					$('#url-input').data('botName', botName);
 				} else {
-					$('#logs').html($('#logs').html() + botName['error_message']);
+					$('#logs').html($('#logs').html() + data.Payload);
 				}
 			}
 		});
