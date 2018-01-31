@@ -12,15 +12,36 @@
 		<link href="https://fonts.googleapis.com/css?family=Lora|Raleway|Roboto" rel="stylesheet">
 	</head>
 	<body>
-		<form id="create-bot" action="" method="POST">
-			<input id="url-input" type="url">
-			<input type="submit">
-		</form>
-		<p id="botname"></p>
-		<p id="response"></p>
-
-		<input id="message-input" type="text">
-		<input id="message-submit" value="Send" type="button">
+		<div class="container">
+			<!-- Bot initialization -->
+			<div id="bot-init-container">
+				<div></div>
+				<div id="bot-init-content">
+					<h1>Create bot</h1>
+					<p>Enter a url to an FAQ page</p>
+					<form id="create-bot" action="" method="POST">
+						<input id="url-input" type="url">
+						<input type="submit">
+					</form>
+					<p id="logs">Logs will appear here.</p>
+				</div>
+			</div>
+	
+			<!-- Bot interaction -->
+			<div id="bot-chat-container">
+				<div id="chat-log">
+					<ul id="chat-log-list">
+						<li><h2>Chat up your bot</h2></li>
+						<li>Ask a question below</li>
+					</ul>
+				</div>
+				<div id="chat-input">
+					<input id="message-input" type="text">
+					<input id="message-submit" value="Send" type="button">
+					<p id="response"></p>
+				</div>
+			</div>
+		</div>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://sdk.amazonaws.com/js/aws-sdk-2.187.0.min.js"></script>

@@ -26,7 +26,8 @@ $(document).ready(function () {
 			} else {
 				pullResults = JSON.parse(data.Payload);
 				botName = pullResults;
-				$('#botname').html(pullResults);
+				$('#logs').html($('#logs').html() + '<br>' + pullResults.trim());
+				$('#url-input').data('botName', pullResults.trim());
 			}
 		});
 	});
@@ -34,11 +35,12 @@ $(document).ready(function () {
 	$('#message-submit').click(function (e) {
 		let messageInput = $('#message-input');
 		let message = messageInput.val();
+		$('#chat-log-list').append('<li>' + 'You: ' + message + '</li>'); 
 		if(message.trim() == '') return;
 		messageInput.val('');
 		var params = {
 			botAlias: 'DEV', /* required */
-			botName: $('#botname').html().trim(), /* required */
+			botName: $('#url-input').data('botName'), /* required */
 			inputText: message, /* required */
 			userId: 'demo-webapp-id', /* required */
 		};
@@ -47,7 +49,7 @@ $(document).ready(function () {
 				console.log(err, err.stack); // an error occurred
 			} else {
 				console.log(data);
-				$('#response').html(data['message']);           // successful response
+				$('#chat-log-list').append('<li>' + 'Bot: ' + data['message'] + '</li>');           // successful response
 			}
 		});
 	})
