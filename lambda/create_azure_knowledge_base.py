@@ -12,7 +12,8 @@ lambda_client = boto3.client('lambda')
 lex_client = boto3.client('lex-models')
 
 def bot_name_from_url(url: str) -> str:
-    """Makes a unique bot name from the base url.
+    """Makes a unique bot name from the base url from the base url and the
+    path url.
 
     Args:
         url: A well-formed URL.
@@ -20,7 +21,11 @@ def bot_name_from_url(url: str) -> str:
     Returns:
         The base url as a titlecased, no-space, no-puncutation string.
     """
-    return convert_to_title(urlparse(url).netloc)  # netloc = base url
+    base_url = urlparse(url).netloc
+    path = urlparse(url).path
+    path_parts = path.split('/')[1:]  # [1:] because first is always empty
+    path_hash = ''.join([pp[:1] for pp in path_parts])[:10]
+    return convert_to_title(base_url + path_hash)
 
 def remove_invalid_punctuation(s: str) -> str:
     """Removes punctuation invalid by Lex intent rules, specifically any
