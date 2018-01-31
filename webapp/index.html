@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<title>Demo | octobot</title>
+
+		<!--<link href="normalize-css.googlecode.com/svn/trunk/normalize.css" rel="stylesheet">-->
+		<link href="css/styles.css" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=Lora|Raleway|Roboto" rel="stylesheet">
+	</head>
+	<body>
+		<form id="create-bot" action="" method="POST">
+			<input id="url-input" type="url">
+			<input type="submit">
+		</form>
+		<p id="botname"></p>
+		<p id="response"></p>
+
+		<input id="message-input" type="text">
+		<input id="message-submit" value="Send" type="button">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://sdk.amazonaws.com/js/aws-sdk-2.187.0.min.js"></script>
+		<script src="js/index.js"></script>
+	</body>
+</html>
