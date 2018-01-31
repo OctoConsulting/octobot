@@ -66,7 +66,7 @@ input {
     height: 2em;
 }
 #chat-log {
-    background: #fff;
+    background: #ccc;
     min-height: 250px;
 }
 #chat-log-list {
@@ -79,5 +79,5 @@ input {
 #chat-log-list > li {
     list-style: none;
     padding: 0.5em 0;
-    border-bottom: solid 1px #e0e0e0;
+    border-bottom: solid 1px #ddd;
 }

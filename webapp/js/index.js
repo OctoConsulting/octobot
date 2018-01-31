@@ -1,3 +1,10 @@
+const enableChat = () => {
+	$('#message-input').prop('disabled', false);
+	$('#message-submit').prop('disabled', false);
+	$('#chat-log').css('background', '#fff');
+	$('#chat-log-list li').css('border-bottom', 'solid 1px #e0e0e0');
+}
+
 $(document).ready(function () {
 	AWS.config.update({ region: 'us-east-1' });
 	AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1252432e-9cd3-479d-98e5-ea5a26878766' });
@@ -30,6 +37,7 @@ $(document).ready(function () {
 					botName = pullResults['bot_name'].trim();
 					$('#logs').html($('#logs').html() + '<br>' + data.Payload);
 					$('#url-input').data('botName', botName);
+					enableChat();
 				} else {
 					$('#logs').html($('#logs').html() + data.Payload);
 				}
