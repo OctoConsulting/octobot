@@ -3,8 +3,7 @@ const converter = new showdown.Converter();
 const enableChat = () => {
 	$('#message-input').prop('disabled', false);
 	$('#message-submit').prop('disabled', false);
-	$('#chat-log').css('background', '#fff');
-	$('#chat-log-list li').css('border-bottom', 'solid 1px #e0e0e0');
+	$('#chat-input').css('opacity', '1');
 }
 
 const log = (message) => {

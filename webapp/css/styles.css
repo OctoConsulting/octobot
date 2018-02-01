@@ -14,10 +14,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 input {
-    padding: 0.5em;
+    padding: 1em;
+    border: none;
+    box-shadow: 0 0 1px #000;
 }
 input:focus {
     outline: none;
+}
+input[type='button'], input[type='submit'] {
+    background: #ff9800;
+    color: #fff;
+}
+input[type='button']:not(:disabled):hover,
+input[type='submit']:not(:disabled):hover {
+    background: #c66900;
+    cursor: pointer;
 }
 
 .container {
@@ -45,7 +56,7 @@ input:focus {
     height: 100%;
     padding: 4rem;
     box-sizing: border-box;
-    background: linear-gradient(to bottom right, #434343, #212121);
+    background: linear-gradient(to bottom right, #424242, #212121);
     color: #fff;
     display: grid;
     grid-template-rows: 0.33fr 1fr;
@@ -64,7 +75,7 @@ input:focus {
     min-height: 350px;
     display: grid;
     grid-template-rows: 1fr 3rem;
-    padding: 1rem;
+    padding: 4rem;
     box-sizing: border-box;
     background: #f8f8f8;
 }
@@ -72,6 +83,7 @@ input:focus {
     display: grid;
     grid-template-columns: 1fr 5rem;
     height: 3em;
+    opacity: 0.54;
 }
 #message-input {
     padding: 1em;
@@ -81,9 +93,9 @@ input:focus {
     border-bottom-right-radius: 1rem;
 }
 #chat-log {
-    background: #ccc;
     min-height: 250px;
     border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 0 4px #000;
 }
 #chat-log-list {
     margin: 0;
