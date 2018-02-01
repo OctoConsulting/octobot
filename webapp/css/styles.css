@@ -17,6 +17,7 @@ input {
     padding: 1em;
     border: none;
     box-shadow: 0 0 1px #000;
+    width: 100%;
 }
 input:focus {
     outline: none;
