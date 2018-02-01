@@ -31,8 +31,13 @@ input:focus {
 @media only screen and (max-width: 786px) {
     .container {
         grid-template-columns: auto;
-        grid-template-rows: 50% 1fr;
+        grid-template-rows: 350px 1fr;
     }
+}
+
+#create-bot {
+    display: grid;
+    grid-template-columns: 1fr auto;
 }
 
 #bot-init-container {

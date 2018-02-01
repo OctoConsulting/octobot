@@ -1,3 +1,5 @@
+const converter = new showdown.Converter();
+
 const enableChat = () => {
 	$('#message-input').prop('disabled', false);
 	$('#message-submit').prop('disabled', false);
@@ -12,7 +14,7 @@ const log = (message) => {
 
 const configureAWS = () => {
 	AWS.config.update({ region: 'us-east-1' });
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1252432e-9cd3-479d-98e5-ea5a26878766' });
+	AWS.config.credentials = new AWS.CognitoIdentityCredentials({ IdentityPoolId: 'us-east-1:1252432e-9cd3-479d-98e5-ea5a26878766' });
 }
 
 const createBot = (url) => {
@@ -43,7 +45,7 @@ const createBot = (url) => {
 }
 
 const appendMessageToChat = (user, message) => {
-	$('#chat-log-list').append('<li>' + user + ': ' + message + '</li>');
+	$('#chat-log-list').append('<li>' + converter.makeHtml(user + ': ' + message) + '</li>');
 }
 
 
