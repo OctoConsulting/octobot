@@ -35,12 +35,34 @@ const createBot = (url) => {
 				botName = pullResults['bot_name'].trim();
 				log(data.Payload);
 				$('#url-input').data('botName', botName);
-				enableChat();
+				enableChatWhenReady(botName);
 			} else {
 				log(data.Payload);
 			}
 		}
 	});
+}
+
+const enableChatWhenReady = (botName) => {
+	let lex = new AWS.LexRuntime({ apiVersion: '2016-11-28' });
+	const params = {
+		botAlias: 'DEV',
+		botName: botName,
+		inputText: 'Hi',
+		userId: 'demo-webapp-id',
+	};
+	log('Bot building...');
+	var poll_lex = setInterval(function(){
+		lex.postText(params, function (err, data) {
+			if (err) {
+				console.log(err.toString());
+			} else {
+				window.clearInterval(poll_lex);
+				log('Bot ready...');
+				enableChat();
+			}
+		});
+	}, 3000);
 }
 
 const appendMessageToChat = (user, message) => {
