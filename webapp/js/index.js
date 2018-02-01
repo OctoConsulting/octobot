@@ -94,7 +94,7 @@ $(document).ready(function () {
 	$('#create-bot').submit(function (e) {
 		e.preventDefault();
 		$(this).children('input').prop('disabled', true);
-		url = $(this).children('#url-input').val();
+		url = $(this).find('#url-input').val();
 		createBot(url);
 	});
 
