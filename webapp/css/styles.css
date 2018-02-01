@@ -16,6 +16,9 @@ h1, h2, h3, h4, h5, h6 {
 input {
     padding: 0.5em;
 }
+input:focus {
+    outline: none;
+}
 
 .container {
     width: 100%;
@@ -55,7 +58,7 @@ input {
     height: 100%;
     min-height: 350px;
     display: grid;
-    grid-template-rows: 1fr 2rem;
+    grid-template-rows: 1fr 3rem;
     padding: 1rem;
     box-sizing: border-box;
     background: #f8f8f8;
@@ -63,15 +66,23 @@ input {
 #chat-input {
     display: grid;
     grid-template-columns: 1fr 5rem;
-    height: 2em;
+    height: 3em;
+}
+#message-input {
+    padding: 1em;
+    border-bottom-left-radius: 1rem;
+}
+#message-submit {
+    border-bottom-right-radius: 1rem;
 }
 #chat-log {
     background: #ccc;
     min-height: 250px;
+    border-radius: 1rem 1rem 0 0;
 }
 #chat-log-list {
     margin: 0;
-    padding: 1rem;
+    padding: 1rem 2rem;
     overflow: auto;
     height: 100%;
     box-sizing: border-box;
