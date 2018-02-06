@@ -5,14 +5,14 @@ lex_client = boto3.client('lex-models')
 ddb_client = boto3.client('dynamodb')
 
 def get_intents_to_delete(bot_name: str) -> list:
-	"""Generates a list of intents associated with the bot.
-
-	Args:
-		bot_name: name of the bot to delete.
-
-	Returns:
-		The list of intents associated with the bot.
-	"""
+    """Generates a list of intents associated with the bot.
+    
+    Args:
+    	bot_name: name of the bot to delete.
+    
+    Returns:
+    	The list of intents associated with the bot.
+    """
     intent_prefix = bot_name + '_'
     intents_to_delete = []
     nextToken = ''
@@ -36,11 +36,11 @@ def get_intents_to_delete(bot_name: str) -> list:
     return intents_to_delete
 
 def delete_bot(bot_name: str) -> None:
-	"""Deletes the defined bot alias and the bot itself.
-
-	Args:
-		bot_name: name of the bot to delete.
-	"""
+    """Deletes the defined bot alias and the bot itself.
+    
+    Args:
+    	bot_name: name of the bot to delete.
+    """
     try:
         lex_client.delete_bot_alias(
             name='DEV',
@@ -56,11 +56,11 @@ def delete_bot(bot_name: str) -> None:
         print(e)
 
 def delete_intents(intent_names: list) -> None:
-	"""Deletes all intents provided, normally associated with a bot.
-
-	Args:
-		intent_names: list of intent names, normally associated with a bot.
-	"""
+    """Deletes all intents provided, normally associated with a bot.
+    
+    Args:
+    	intent_names: list of intent names, normally associated with a bot.
+    """
     for intent_name in intent_names:
         for n in range(10):  # Max of 10 tries
             try:
@@ -73,11 +73,11 @@ def delete_intents(intent_names: list) -> None:
             time.sleep(2)
 
 def delete_table(table_name):
-	"""Deletes table of intents and responses.
-
-	Args:
-		table_name: name of the table to delete.
-	"""
+    """Deletes table of intents and responses.
+    
+    Args:
+    	table_name: name of the table to delete.
+    """
     ddb_client.delete_table(TableName=table_name)
 
 def lambda_handler(event, context):
