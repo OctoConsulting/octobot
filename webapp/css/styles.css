@@ -43,6 +43,7 @@ input[type='submit']:not(:disabled):hover {
     height: 100%;
     display: grid;
     grid-template-columns: 33% 1fr;
+    grid-template-rows: 100%;
     align-items: center;
     justify-items: center;
 }

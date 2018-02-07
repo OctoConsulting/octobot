@@ -93,7 +93,7 @@ $(document).ready(function () {
 
 	$('#create-bot').submit(function (e) {
 		e.preventDefault();
-		$(this).children('input').prop('disabled', true);
+		$(this).find('input').prop('disabled', true);
 		url = $(this).find('#url-input').val();
 		createBot(url);
 	});
