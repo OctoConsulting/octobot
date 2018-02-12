@@ -32,7 +32,7 @@ const createBot = (url) => {
 			const pullResults = JSON.parse(data.Payload);
 			const pullBody = JSON.parse(pullResults.body)
 			console.log(pullBody);
-			if (pullBody['succeeded']) {
+			if (!pullBody['error_message']) {
 				botName = pullBody['bot_name'].trim();
 				log(data.Payload);
 				$('#url-input').data('botName', botName);
