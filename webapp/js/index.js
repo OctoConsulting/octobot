@@ -29,10 +29,11 @@ const createBot = (url) => {
 		if (err) {
 			log(err);
 		} else {
-			pullResults = JSON.parse(data.Payload);
-			console.log(pullResults);
-			if (pullResults['succeeded']) {
-				botName = pullResults['bot_name'].trim();
+			const pullResults = JSON.parse(data.Payload);
+			const pullBody = JSON.parse(pullResults.body)
+			console.log(pullBody);
+			if (pullBody['succeeded']) {
+				botName = pullBody['bot_name'].trim();
 				log(data.Payload);
 				$('#url-input').data('botName', botName);
 				enableChatWhenReady(botName);
