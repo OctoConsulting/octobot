@@ -1,5 +1,6 @@
 import boto3
 import time
+from botocore.exceptions import ClientError
 
 lex_client = boto3.client('lex-models')
 ddb_client = boto3.client('dynamodb')
@@ -20,7 +21,8 @@ def get_intents_to_delete(bot_name: str) -> list:
         if not nextToken:
             response = lex_client.get_intents(
                 maxResults=50,
-                nameContains=intent_prefix
+                nameContains=intent_prefix,
+                nextToken=''
             )
         else:
             response = lex_client.get_intents(
@@ -41,19 +43,42 @@ def delete_bot(bot_name: str) -> None:
     Args:
     	bot_name: name of the bot to delete.
     """
-    try:
-        lex_client.delete_bot_alias(
-            name='DEV',
-            botName=bot_name
-        )
-    except Exception as e:
-        print(e)
-    try:
-        lex_client.delete_bot(
-            name=bot_name
-        )
-    except Exception as e:
-        print(e)
+    for n in range(10):  # Max of 10 tries
+        try:
+            lex_client.delete_bot_alias(
+                name='DEV',
+                botName=bot_name
+            )
+        except ClientError as e:
+            exception_name = e.response['Error']['Code']
+            if exception_name == 'NotFoundException':
+                break
+            else:
+                print(e)
+                time.sleep(2)
+        else:
+            break
+    else:
+        print('Deleting bot alias failed.')
+        return
+    
+    for n in range(10):  # Max of 10 tries
+        try:
+            lex_client.delete_bot(
+                name=bot_name
+            )
+        except ClientError as e:
+            exception_name = e.response['Error']['Code']
+            if exception_name == 'NotFoundException':
+                break
+            else:
+                print(e)
+                time.sleep(2)
+        else:
+            break
+    else:
+        print('Deleting bot failed.')
+        return
 
 def delete_intents(intent_names: list) -> None:
     """Deletes all intents provided, normally associated with a bot.
@@ -66,10 +91,13 @@ def delete_intents(intent_names: list) -> None:
             try:
                 lex_client.delete_intent(name=intent_name)
                 break
-            except NotFoundException:
-                break
-            except Exception as e:
-                print(e)
+            except ClientError as e:
+                exception_name = e.response['Error']['Code']
+                if exception_name == 'NotFoundException':
+                    break
+                else:
+                    print(e)
+                    time.sleep(2)
             time.sleep(2)
 
 def delete_table(table_name):
@@ -78,7 +106,11 @@ def delete_table(table_name):
     Args:
     	table_name: name of the table to delete.
     """
-    ddb_client.delete_table(TableName=table_name)
+    try:
+        ddb_client.delete_table(TableName=table_name)
+    except ClientError as e:
+        exception_name = e.response['Error']['Code']
+        print(e)
 
 def lambda_handler(event, context):
     bot_name = event['bot_name']
