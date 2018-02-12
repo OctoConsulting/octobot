@@ -92,11 +92,13 @@ def lambda_handler(event, context):
     } for intent in intents]
     
     create_intent_versions(intents_name_version_list)
+    
+    
     create_bot_response = create_bot(bot_name, intents_name_version_list)
-	
+
     lex_client.create_bot_version(name=bot_name)
     
-    for n in range(40):
+    for n in range(80):
         try:
             lex_client.put_bot_alias(
                 name='DEV',

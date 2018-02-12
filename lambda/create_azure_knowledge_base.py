@@ -24,7 +24,7 @@ def bot_name_from_url(url: str) -> str:
     base_url = urlparse(url).netloc
     path = urlparse(url).path
     path_parts = path.split('/')[1:]  # [1:] because first is always empty
-    path_hash = ''.join([pp[:1] for pp in path_parts])[:10]
+    path_hash = ''.join([pp[:2] for pp in path_parts])[:10]  # "hash" the rest of the url
     return convert_to_title(base_url + path_hash)
 
 def remove_invalid_punctuation(s: str) -> str:
