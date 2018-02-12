@@ -162,15 +162,33 @@ def delete_knowledge_base(kbId: str) -> None:
     delete_request.add_header('Ocp-Apim-Subscription-Key', QNAMAKER_API_KEY)
     delete_response = urlopen(delete_request, timeout=15).read().decode('utf-8')
 
+
+def get_response_package(response_info: object) -> object:
+    """Generates a response package in line with API Gateway requirements.
+
+    Args:
+        response_info: a json object containing any custom information.
+
+    Returns:
+        A package in the format specified by API Gateway return requirements.
+    """
+    return {
+	    'isBase64Encoded': 'false',
+	    'statusCode': 200,
+	    'headers': {},
+	    'body': json.dumps(response_info)
+	}
+
+
 def lambda_handler(event, context):
     # TODO: Check urlopen responses for success and deal with endpoint
     faq_url = event['url']
     bot_name = bot_name_from_url(faq_url)
 
     # Return package
-    return_package = {
+    response_info = {
         'already_made': True,
-        'succeeded': True,
+        'creating': False,
         'bot_name': bot_name,
         'error_message': ''
     }
@@ -179,11 +197,14 @@ def lambda_handler(event, context):
     try:
         lex_client.get_bot(name=bot_name, versionOrAlias='DEV')
         print('Returned bot name')
-        return return_package
+        return get_response_package(response_info)
     except Exception as e:
         print(bot_name, 'not found')
         print('Starting pipeline...')
 
+    
+    # TODO: Async calls to Azure 
+    
     # Create knowledge base from faq url
     create_response = create_knowledge_base(faq_url)
     create_response_json = json.loads(create_response)
@@ -201,10 +222,11 @@ def lambda_handler(event, context):
 
     # Invoke CreateLexBot
     create_lex_response_table_response = invoke_function('CreateLexResponseTable', 'Event', payload)
-    create_lex_bot_response = invoke_function('CreateLexBot', 'RequestResponse', payload)
+    create_lex_bot_response = invoke_function('CreateLexBot', 'Event', payload)
 
     # Delete knowledge base after done with it
     delete_knowledge_base(kbId)
 
-    return_package['already_made'] = False
-    return return_package
+    response_info['already_made'] = False
+    response_info['creating'] = True
+    return get_response_package(response_info)
