@@ -2,6 +2,7 @@ import boto3
 
 lambda_client = boto3.client('lambda')
 
+
 def lambda_handler(event, context):
     response = lambda_client.add_permission(
         Action='lambda:InvokeFunction',

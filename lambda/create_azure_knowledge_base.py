@@ -11,6 +11,7 @@ QNAMAKER_API_KEY = os.environ['qnamaker_api_key']
 lambda_client = boto3.client('lambda')
 lex_client = boto3.client('lex-models')
 
+
 def bot_name_from_url(url: str) -> str:
     """Makes a unique bot name from the base url from the base url and the
     path url.
@@ -24,8 +25,10 @@ def bot_name_from_url(url: str) -> str:
     base_url = urlparse(url).netloc
     path = urlparse(url).path
     path_parts = path.split('/')[1:]  # [1:] because first is always empty
-    path_hash = ''.join([pp[:2] for pp in path_parts])[:10]  # "hash" the rest of the url
+    path_hash = ''.join([pp[:2] for pp in path_parts])[
+        :10]  # "hash" the rest of the url
     return convert_to_title(base_url + path_hash)
+
 
 def remove_invalid_punctuation(s: str) -> str:
     """Removes punctuation invalid by Lex intent rules, specifically any
@@ -38,15 +41,18 @@ def remove_invalid_punctuation(s: str) -> str:
         The input string without invalid punctuation.
     """
     # Create string of invalid punctuation
-    invalid_punctuation = ''.join([ch for ch in string.punctuation if ch not in '-_\''])
+    invalid_punctuation = ''.join(
+        [ch for ch in string.punctuation if ch not in '-_\''])
     # Remove punctuation from string
     s = s.translate(s.maketrans('', '', invalid_punctuation))
     s = s.strip()
     return s
 
+
 def convert_to_intent_name(s: str) -> str:
     whitelist = set(string.ascii_lowercase + string.ascii_uppercase)
     return ''.join(filter(whitelist.__contains__, s))
+
 
 def convert_to_title(s: str) -> str:
     """Formats string as a title, such that the input string has no punctuation,
@@ -65,6 +71,7 @@ def convert_to_title(s: str) -> str:
     s = s.translate(s.maketrans('', '', string.whitespace))
     return s
 
+
 def create_knowledge_base(faq_url: str) -> str:
     """Creates knowledge base from FAQ URL using Azure QnAMaker at
     https://qnamaker.ai/.
@@ -81,13 +88,16 @@ def create_knowledge_base(faq_url: str) -> str:
     create_request.add_header('Content-Type', 'application/json')
     # TODO: call crawler to get all faq urls if the user wants it to
     input_data = str.encode(str({
-        'name': 'CAKB_' + convert_to_title(asctime()), # include the time of creation in the bot title for logging
+        # include the time of creation in the bot title for logging
+        'name': 'CAKB_' + convert_to_title(asctime()),
         'urls': [
             faq_url
         ]
     }))
-    create_response = urlopen(create_request, data=input_data, timeout=15).read().decode('utf-8')
+    create_response = urlopen(
+        create_request, data=input_data, timeout=15).read().decode('utf-8')
     return create_response
+
 
 def download_knowledge_base(kbId: str) -> str:
     """Downloads knowledge base from Azure QnAMaker at https://qnamaker.ai/.
@@ -100,11 +110,16 @@ def download_knowledge_base(kbId: str) -> str:
     """
     download_kb_request_endpoint = 'https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/' + kbId
     download_kb_request = Request(download_kb_request_endpoint)
-    download_kb_request.add_header('Ocp-Apim-Subscription-Key', QNAMAKER_API_KEY)
-    download_kb_response = urlopen(download_kb_request, timeout=15).read().decode('utf-8') # returns an address from which to download kb
-    download_kb_link = download_kb_response[1:-1] #[1:-1] removes quotation marks from url
-    kb_response = urlopen(download_kb_link).read().decode('utf-8-sig') # must be utf-8-sig to remove BOM characters
+    download_kb_request.add_header(
+        'Ocp-Apim-Subscription-Key', QNAMAKER_API_KEY)
+    download_kb_response = urlopen(download_kb_request, timeout=15).read().decode(
+        'utf-8')  # returns an address from which to download kb
+    # [1:-1] removes quotation marks from url
+    download_kb_link = download_kb_response[1:-1]
+    kb_response = urlopen(download_kb_link).read().decode(
+        'utf-8-sig')  # must be utf-8-sig to remove BOM characters
     return kb_response
+
 
 def generate_intents_from_knowledge_base(kb_tab_separated: str) -> list:
     """Generates a list of intent objects from knowledge base as a tab-separated
@@ -118,16 +133,19 @@ def generate_intents_from_knowledge_base(kb_tab_separated: str) -> list:
         sample utterances, and a response.
     """
     lines = kb_tab_separated.split('\r')
-    lines = lines[1:-1]  # the first line are just headers; the last line is empty
+    # the first line are just headers; the last line is empty
+    lines = lines[1:-1]
     lines = [line.split('\t') for line in lines]
 
     intents = [{
-            'name': convert_to_intent_name(question)[:65],  # only take first 65 characters, full intent name <100 characters
-            'sample_utterances': [remove_invalid_punctuation(question)],
-            'response': answer
-        } for question, answer, source in lines]
+        # only take first 65 characters, full intent name <100 characters
+        'name': convert_to_intent_name(question)[:65],
+        'sample_utterances': [remove_invalid_punctuation(question)],
+        'response': answer
+    } for question, answer, source in lines]
 
     return intents
+
 
 def invoke_function(func_name: str, invoc_type: str, payload: object) -> str:
     """Invokes the Lambda function specified by the arguments.
@@ -151,6 +169,7 @@ def invoke_function(func_name: str, invoc_type: str, payload: object) -> str:
         raise e
     return response
 
+
 def delete_knowledge_base(kbId: str) -> None:
     """Deletes knowledge base from Azure QnAMaker at https://qnamaker.ai/.
 
@@ -160,7 +179,8 @@ def delete_knowledge_base(kbId: str) -> None:
     delete_request_endpoint = 'https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/' + kbId
     delete_request = Request(delete_request_endpoint, method='DELETE')
     delete_request.add_header('Ocp-Apim-Subscription-Key', QNAMAKER_API_KEY)
-    delete_response = urlopen(delete_request, timeout=15).read().decode('utf-8')
+    delete_response = urlopen(
+        delete_request, timeout=15).read().decode('utf-8')
 
 
 def get_response_package(response_info: object) -> object:
@@ -173,11 +193,11 @@ def get_response_package(response_info: object) -> object:
         A package in the format specified by API Gateway return requirements.
     """
     return {
-	    'isBase64Encoded': 'false',
-	    'statusCode': 200,
-	    'headers': {},
-	    'body': json.dumps(response_info)
-	}
+        'isBase64Encoded': 'false',
+        'statusCode': 200,
+        'headers': {},
+        'body': json.dumps(response_info)
+    }
 
 
 def lambda_handler(event, context):
@@ -202,9 +222,8 @@ def lambda_handler(event, context):
         print(bot_name, 'not found')
         print('Starting pipeline...')
 
-    
-    # TODO: Async calls to Azure 
-    
+    # TODO: Async calls to Azure
+
     # Create knowledge base from faq url
     create_response = create_knowledge_base(faq_url)
     create_response_json = json.loads(create_response)
@@ -221,7 +240,8 @@ def lambda_handler(event, context):
     }
 
     # Invoke CreateLexBot
-    create_lex_response_table_response = invoke_function('CreateLexResponseTable', 'Event', payload)
+    create_lex_response_table_response = invoke_function(
+        'CreateLexResponseTable', 'Event', payload)
     create_lex_bot_response = invoke_function('CreateLexBot', 'Event', payload)
 
     # Delete knowledge base after done with it

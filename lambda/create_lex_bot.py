@@ -2,11 +2,12 @@ import boto3
 import time
 
 lex_client = boto3.client('lex-models')
-    
+
+
 def create_intents(bot_name: str, intents: list) -> None:
     """Create Lex intents from intent objects list. All intents have the same
     fulfillment activity code hook to the Lambda function LexResponder.
-    
+
     Args:
         bot_name: name of bot to be created.
         intents: a list of intent objects where each intent object defines the
@@ -29,7 +30,8 @@ def create_intents(bot_name: str, intents: list) -> None:
             )
         except Exception as e:
             print(e)
-        
+
+
 def create_intent_versions(intents):
     for intent in intents:
         try:
@@ -38,10 +40,11 @@ def create_intent_versions(intents):
             )
         except Exception as e:
             print(e)
-    
+
+
 def create_bot(bot_name: str, intents_name_version_list: list) -> str:
     """Create Lex bot with all specified intents attached.
-    
+
     Args:
         bot_name: name of bot to be created.
         intents_name_version_list: a list of intent objects where each intent
@@ -52,7 +55,7 @@ def create_bot(bot_name: str, intents_name_version_list: list) -> str:
         name=bot_name,
         intents=intents_name_version_list,
         clarificationPrompt={
-            'messages':[
+            'messages': [
                 {
                     'contentType': 'PlainText',
                     'content': 'Sorry, can you repeat that?'
@@ -62,7 +65,7 @@ def create_bot(bot_name: str, intents_name_version_list: list) -> str:
             'responseCard': 'Response card for clarificationPrompt'
         },
         abortStatement={
-            'messages':[
+            'messages': [
                 {
                     'contentType': 'PlainText',
                     'content': 'Sorry, I don\'t think I know how to help you.'
@@ -74,41 +77,39 @@ def create_bot(bot_name: str, intents_name_version_list: list) -> str:
         voiceId='Kendra',
         locale='en-US',
         childDirected=False
-        )
+    )
     return create_bot_response
-    
+
+
 def lambda_handler(event, context):
     assert 'intents' in event and len(event['intents']) > 0
-    
+
     intents = event['intents']
     bot_name = event['bot_name']
-    
+
     create_intents(bot_name, intents)
-    
-    
+
     intents_name_version_list = [{
         'intentName': bot_name + '_' + intent['name'],
         'intentVersion': '1'
     } for intent in intents]
-    
+
     create_intent_versions(intents_name_version_list)
-    
-    
+
     create_bot_response = create_bot(bot_name, intents_name_version_list)
 
     lex_client.create_bot_version(name=bot_name)
-    
+
     for n in range(80):
         try:
             lex_client.put_bot_alias(
                 name='DEV',
                 botVersion='1',
                 botName=bot_name
-            );
+            )
             break
         except:
             print('error', n)
         time.sleep(3)
-        
-    
+
     return str(create_bot_response)

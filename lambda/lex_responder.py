@@ -1,12 +1,13 @@
 import boto3
 
+
 def lambda_handler(event, context):
     bot_name = event['bot']['name']
     current_intent_name = event['currentIntent']['name']
-    
+
     table_name = bot_name + '_intents'
     ddb_client = boto3.client('dynamodb')
-    
+
     # TODO: add error handling
     get_item_response = ddb_client.get_item(
         TableName=table_name,
@@ -20,13 +21,13 @@ def lambda_handler(event, context):
         }
     )
     print(get_item_response)
-    
+
     response_text = 'Sorry, look up failed.'
     try:
         response_text = str(get_item_response['Item']['response']['S'])
     except:
         pass
-    
+
     return_package = {
         'dialogAction': {
             'type': 'Close',
@@ -37,5 +38,5 @@ def lambda_handler(event, context):
             }
         }
     }
-    
+
     return return_package
