@@ -172,6 +172,25 @@ def get_response_package(response_info: object) -> object:
     }
 
 
+def declare_bot_not_exists(bot_name):
+    """Delete bot from octochat_bots table to signify it no longer exists.
+
+    Args:
+        bot_name: name of bot.
+    """
+    try:
+        ddb_client.delete_item(
+            TableName='octochat_bots',
+            Key={
+                'name': {
+                    'S': bot_name
+                }
+            }
+        )
+    except Exception as e:
+        print(e)
+
+
 def lambda_handler(event, context):
     faq_url = event['url']
     bot_name = bot_name_from_url(faq_url)
@@ -182,6 +201,7 @@ def lambda_handler(event, context):
     delete_bot(bot_name)
     delete_intents(intents_to_delete)
     delete_table(table_name)
+    declare_bot_not_exists(bot_name)
 
     response_info = {
         'bot_name': bot_name

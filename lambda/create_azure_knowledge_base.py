@@ -5,11 +5,14 @@ import boto3
 import string
 from time import asctime
 import os
+import time
 from base64 import b64decode
+from botocore.exceptions import ClientError
 
 QNAMAKER_API_KEY = os.environ['qnamaker_api_key']
 lambda_client = boto3.client('lambda')
 lex_client = boto3.client('lex-models')
+ddb_client = boto3.client('dynamodb')
 
 
 def bot_name_from_url(url: str) -> str:
@@ -200,6 +203,85 @@ def get_response_package(response_info: object) -> object:
     }
 
 
+def create_bots_table():
+    """Creates a table to contain bots if it does not exist already.
+
+    Returns:
+        True if table already exists and False otherwise.
+    """
+    try:
+        describe_table_response = ddb_client.describe_table(
+            TableName='octochat_bots')
+    except ClientError as e:
+        exception_name = e.response['Error']['Code']
+        if exception_name == 'ResourceNotFoundException':
+            ddb_client.create_table(
+                TableName='octochat_bots',
+                AttributeDefinitions=[
+                    {
+                        'AttributeName': 'name',
+                        'AttributeType': 'S'
+                    }
+                ],
+                KeySchema=[
+                    {
+                        'AttributeName': 'name',
+                        'KeyType': 'HASH'
+                    }
+                ],
+                ProvisionedThroughput={
+                    'ReadCapacityUnits': 10,
+                    'WriteCapacityUnits': 10
+                }
+            )
+            return False
+    return True
+
+
+def check_if_bot_exists(bot_name):
+    """Checks if bot already exists in octochat_bots table.
+
+    Args:
+        bot_name: name of bot.
+
+    Returns:
+        True if bot exists and False otherwise.
+    """
+    get_item_response = ddb_client.get_item(
+        TableName='octochat_bots',
+        Key={
+            'name': {
+                'S': bot_name
+            }
+        }
+    )
+    if 'Item' in get_item_response:
+        return True
+    return False
+
+
+def declare_bot_exists(bot_name):
+    """Puts bot in octochat_bots table to signify it exists.
+
+    Args:
+        bot_name: name of bot.
+    """
+    for n in range(10):  # Max 10 tries
+        try:
+            ddb_client.put_item(
+                TableName='octochat_bots',
+                Item={
+                    'name': {
+                        'S': bot_name
+                    }
+                }
+            )
+            break
+        except Exception as e:
+            time.sleep(2)
+            print(e)
+
+
 def lambda_handler(event, context):
     # TODO: Check urlopen responses for success and deal with endpoint
     faq_url = event['url']
@@ -213,14 +295,14 @@ def lambda_handler(event, context):
         'error_message': ''
     }
 
-    # Check if bot is already there
-    try:
-        lex_client.get_bot(name=bot_name, versionOrAlias='DEV')
-        print('Returned bot name')
-        return get_response_package(response_info)
-    except Exception as e:
-        print(bot_name, 'not found')
-        print('Starting pipeline...')
+    # Add table
+    table_already_exists = create_bots_table()
+    if table_already_exists:
+        if check_if_bot_exists(bot_name):
+            return get_response_package(response_info)
+    declare_bot_exists(bot_name)
+    print(bot_name, 'not found')
+    print('Starting pipeline...')
 
     # TODO: Async calls to Azure
 
