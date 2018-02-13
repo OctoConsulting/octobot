@@ -1,9 +1,44 @@
 import boto3
+import string
 import time
 from botocore.exceptions import ClientError
+from urllib.parse import urlparse
 
 lex_client = boto3.client('lex-models')
 ddb_client = boto3.client('dynamodb')
+
+def bot_name_from_url(url: str) -> str:
+    """Makes a unique bot name from the base url from the base url and the
+    path url.
+
+    Args:
+        url: A well-formed URL.
+
+    Returns:
+        The base url as a titlecased, no-space, no-puncutation string.
+    """
+    base_url = urlparse(url).netloc
+    path = urlparse(url).path
+    path_parts = path.split('/')[1:]  # [1:] because first is always empty
+    path_hash = ''.join([pp[:2] for pp in path_parts])[:10]  # "hash" the rest of the url
+    return convert_to_title(base_url + path_hash)
+
+def convert_to_title(s: str) -> str:
+    """Formats string as a title, such that the input string has no punctuation,
+    is titlecased, and has no whitespace.
+
+    Args:
+        s: any string.
+
+    Returns:
+        The input string as a title.
+    """
+    # Remove punctuation
+    s = s.translate(s.maketrans('', '', string.punctuation))
+    s = s.title()
+    # Remove whitespace
+    s = s.translate(s.maketrans('', '', string.whitespace))
+    return s
 
 def get_intents_to_delete(bot_name: str) -> list:
     """Generates a list of intents associated with the bot.
@@ -112,8 +147,26 @@ def delete_table(table_name):
         exception_name = e.response['Error']['Code']
         print(e)
 
+def get_response_package(response_info: object) -> object:
+    """Generates a response package in line with API Gateway requirements.
+
+    Args:
+        response_info: a json object containing any custom information.
+
+    Returns:
+        A package in the format specified by API Gateway return requirements.
+    """
+    return {
+	    'isBase64Encoded': 'false',
+	    'statusCode': 200,
+	    'headers': {},
+	    'body': json.dumps(response_info)
+	}
+	
 def lambda_handler(event, context):
-    bot_name = event['bot_name']
+    faq_url = event['url']
+    bot_name = bot_name_from_url(faq_url)
+    
     table_name = bot_name + '_intents'
     intents_to_delete = get_intents_to_delete(bot_name)
 
@@ -121,4 +174,7 @@ def lambda_handler(event, context):
     delete_intents(intents_to_delete)
     delete_table(table_name)
 
-    return True
+    response_info = {
+        'bot_name': bot_name
+    }
+    return get_response_package(response_info)
