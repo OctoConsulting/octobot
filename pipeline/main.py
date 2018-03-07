@@ -1,4 +1,7 @@
 import boto3
+import lexinterface as lx
+import status
+import qnamaker as qm
 import string
 import sys
 from urllib.parse import urlparse
@@ -41,10 +44,44 @@ def convert_to_title(s: str) -> str:
 
 def main(event):
     faq_url = event['url']
-    print(faq_url)
-    print(bot_name_from_url(faq_url))
+    bot_name = bot_name_from_url(faq_url)
+    table_name = bot_name + '_intents'
+
+    # Get intents from FAQ
+    status.update_bot_stage(bot_name, 'EXTRACTING')
+    api_key = qm.get_API_key()
+    kbId = qm.create_knowledge_base(faq_url, api_key)
+    intents = qm.download_knowledge_base(kbId, api_key)
+    qm.delete_knowledge_base(kbId, api_key)
+
+    # Save intents 
+    status.update_bot_stage(bot_name, 'STORING')
+    lx.create_dynamodb_table(table_name)
+    if not lx.wait_until_table_ready(table_name, 20):
+        return 1
+    put_requests = [lx.put_request(bot_name, intent) for intent in intents]
+    lx.iterate_batch_write_item(table_name, put_requests)
+
+    # Create Lex intents and bot
+    status.update_bot_stage(bot_name, 'BUILDING')
+    intent_list = [{
+        'intentName': bot_name + '_' + intent['name'],
+        'intentVersion': '1'
+    } for intent in intents]
+    lx.create_intents(bot_name, intents)
+    lx.create_intent_versions(intent_list)
+    lx.create_bot(bot_name, intent_list)
+    lx.create_bot_version(bot_name)
+
+    # Publish bot
+    status.update_bot_stage(bot_name, 'PUBLISHING')
+    lx.create_bot_alias(bot_name, 80)
+    
+    # Done
+    status.update_bot_stage(bot_name, 'READY')
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
         main({'url': sys.argv[1]})
+
