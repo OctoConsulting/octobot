@@ -6,6 +6,13 @@ import string
 import sys
 from urllib.parse import urlparse
 
+response_codes = [
+    'Bot successfully built',
+    'Bot already exists',
+    'Creating intent table timed out'
+]
+
+
 def bot_name_from_url(url: str) -> str:
     """Makes a unique bot name from the base url from the base url and the
     path url.
@@ -47,6 +54,10 @@ def main(event):
     bot_name = bot_name_from_url(faq_url)
     table_name = bot_name + '_intents'
 
+    # Check if already exists
+    if status.get_bot_stage(bot_name) != 'DNE':
+        return 1
+
     # Get intents from FAQ
     status.update_bot_stage(bot_name, 'EXTRACTING')
     api_key = qm.get_API_key()
@@ -58,7 +69,7 @@ def main(event):
     status.update_bot_stage(bot_name, 'STORING')
     lx.create_dynamodb_table(table_name)
     if not lx.wait_until_table_ready(table_name, 20):
-        return 1
+        return 2
     put_requests = [lx.put_request(bot_name, intent) for intent in intents]
     lx.iterate_batch_write_item(table_name, put_requests)
 
@@ -75,13 +86,17 @@ def main(event):
 
     # Publish bot
     status.update_bot_stage(bot_name, 'PUBLISHING')
-    lx.create_bot_alias(bot_name, 80)
+    lx.create_bot_alias(bot_name, 100)
     
     # Done
     status.update_bot_stage(bot_name, 'READY')
 
+    return 0
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
-        main({'url': sys.argv[1]})
+        rcode = main({'url': sys.argv[1]})
+        print(response_codes[rcode])
+    else:
+        print('Call must be of form "python3 main.py <url>"')
 
