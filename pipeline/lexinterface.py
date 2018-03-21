@@ -114,6 +114,33 @@ def iterate_batch_write_item(table_name: str, put_requests: list) -> None:
         )
 
 
+def clean_utterance(utterance: str) -> str:
+    """Clean utterance to make it fit the right length and character set.
+
+    Args:
+        utterance: The utterance string.
+
+    Returns:
+        The utterance that meets Lex specifications.
+    """
+    stopwords = ['i', 'to', 'a', 'an', 'the']
+    new_utterance = ' '.join([w for w in utterance.split() if w.lower() not in stopwords])
+    new_utterance = new_utterance[:100]
+    return new_utterance
+
+def clean_intent_name(intent: str) -> str:
+    """Clean intent to make it fit the right length and character set.
+
+    Args:
+        intent: The intent name string.
+
+    Returns:
+        The intent that meets Lex specifications.
+    """ 
+    new_intent = intent[:86]  # max 100 characters but must account for prepended
+                                   # lex-us-east-1-
+    return new_intent
+
 def create_intents(bot_name: str, intents: list) -> None:
     """Create Lex intents from intent objects list. All intents have the same
     fulfillment activity code hook to the Lambda function LexResponder.
@@ -126,10 +153,13 @@ def create_intents(bot_name: str, intents: list) -> None:
     for intent in intents:
         # TODO: add exception handling to handle if intent already exists
         cur_intent_name = bot_name + '_' + intent['name']
+        # unneeded: clean_intent_name(cur_intent_name)
+        #           cur_sample_utterances = [clean_utterance(i) for i in intent['sample_utterances']]
+        cur_sample_utterances = intent['sample_utterances']
         try:
             lex_client.put_intent(
                 name=cur_intent_name,
-                sampleUtterances=intent['sample_utterances'],
+                sampleUtterances=cur_sample_utterances,
                 fulfillmentActivity={
                     'type': 'CodeHook',
                     'codeHook': {
@@ -166,33 +196,38 @@ def create_bot(bot_name: str, intents_name_version_list: list) -> str:
             object defines the intent name and version.
     """
     # TODO: add exception handling to handle if bot already exists
-    create_bot_response = lex_client.put_bot(
-        name=bot_name,
-        intents=intents_name_version_list,
-        clarificationPrompt={
-            'messages': [
-                {
-                    'contentType': 'PlainText',
-                    'content': 'Sorry, can you repeat that?'
-                }
-            ],
-            'maxAttempts': 3,
-            'responseCard': 'Response card for clarificationPrompt'
-        },
-        abortStatement={
-            'messages': [
-                {
-                    'contentType': 'PlainText',
-                    'content': 'Sorry, I don\'t think I know how to help you.'
-                }
-            ],
-            'responseCard': 'Response card for abortStatement'
-        },
-        idleSessionTTLInSeconds=123,
-        voiceId='Kendra',
-        locale='en-US',
-        childDirected=False
-    )
+    for n in range(10):  # Max number of attempts
+        try:
+            create_bot_response = lex_client.put_bot(
+                name=bot_name,
+                intents=intents_name_version_list,
+                clarificationPrompt={
+                    'messages': [
+                        {
+                            'contentType': 'PlainText',
+                            'content': 'Sorry, can you repeat that?'
+                        }
+                    ],
+                    'maxAttempts': 3,
+                    'responseCard': 'Response card for clarificationPrompt'
+                },
+                abortStatement={
+                    'messages': [
+                        {
+                            'contentType': 'PlainText',
+                            'content': 'Sorry, I don\'t think I know how to help you.'
+                        }
+                    ],
+                    'responseCard': 'Response card for abortStatement'
+                },
+                idleSessionTTLInSeconds=123,
+                voiceId='Kendra',
+                locale='en-US',
+                childDirected=False
+            )
+            break
+        except Exception as e:
+            time.sleep(10)
     return create_bot_response
 
 
@@ -223,3 +258,74 @@ def create_bot_alias(bot_name: str, max_attempts: int = 80) -> None:
             print('error', n)
         time.sleep(3)
     return False
+
+qnamaker_api_key: 'ca294f56e7124392bc34eeffdd2f8d67'
+def delete_bot(bot_name: str) -> None:
+    """Deletes the defined bot alias and the bot itself.
+    
+    Args:
+        bot_name: name of the bot to delete.
+    """
+    for n in range(10):  # Max of 10 tries
+        try:
+            lex_client.delete_bot_alias(
+                name='DEV',
+                botName=bot_name
+            )
+        except Exception as e:
+            try:
+                exception_name = e.response['Error']['Code']
+            except:
+                break
+            if exception_name == 'NotFoundException':
+                break
+            else:
+                print(e)
+                time.sleep(2)
+        else:
+            break
+    else:
+        print('Deleting bot alias failed.')
+        return
+
+    for n in range(10):  # Max of 10 tries
+        try:
+            lex_client.delete_bot(
+                name=bot_name
+            )
+        except Exception as e:
+            try:
+                exception_name = e.response['Error']['Code']
+            except:
+                break
+            if exception_name == 'NotFoundException':
+                break
+            else:
+                print(e)
+            time.sleep(2)
+        else:
+            break
+    else:
+        print('Deleting bot failed.')
+        return
+
+def delete_intents(intent_names: list) -> None:
+    """Deletes all intents provided, normally associated with a bot.
+
+    Args:
+        intent_names: list of intent names, normally associated with a bot.
+    """
+    for intent_name in intent_names:
+        for n in range(10):  # Max of 10 tries
+            try:
+                lex_client.delete_intent(name=intent_name)
+                break
+            except Exception as e:
+                exception_name = e.response['Error']['Code']
+                if exception_name == 'NotFoundException':
+                    break
+                else:
+                    print(e)
+                    time.sleep(2)
+            time.sleep(2)
+

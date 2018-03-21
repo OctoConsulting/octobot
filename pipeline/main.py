@@ -54,9 +54,13 @@ def main(event):
     bot_name = bot_name_from_url(faq_url)
     table_name = bot_name + '_intents'
 
+    status.create_bot_stage_table()
+ 
     # Check if already exists
     if status.get_bot_stage(bot_name) != 'DNE':
         return 1
+
+    status.update_bot_faqurl(bot_name, faq_url)
 
     # Get intents from FAQ
     status.update_bot_stage(bot_name, 'EXTRACTING')
@@ -70,6 +74,12 @@ def main(event):
     lx.create_dynamodb_table(table_name)
     if not lx.wait_until_table_ready(table_name, 20):
         return 2
+    max_intent_length = 100 - (len(bot_name) + 1)
+    intents = [{
+        'name': lx.clean_intent_name(intent['name']),
+        'sample_utterances': [lx.clean_utterance(i) for i in intent['sample_utterances']],
+        'response': intent['response']
+    } for intent in intents]
     put_requests = [lx.put_request(bot_name, intent) for intent in intents]
     lx.iterate_batch_write_item(table_name, put_requests)
 
