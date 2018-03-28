@@ -29,8 +29,40 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="delete-module">
-<h1>delete module<a class="headerlink" href="#delete-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-delete">
+<span id="delete-module"></span><h1>delete module<a class="headerlink" href="#module-delete" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="delete.delete_intent_table">
+<code class="descclassname">delete.</code><code class="descname">delete_intent_table</code><span class="sig-paren">(</span><em>table_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#delete.delete_intent_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete table of intents for bot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>table_name: The name of the table.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="delete.get_intents_to_delete">
+<code class="descclassname">delete.</code><code class="descname">get_intents_to_delete</code><span class="sig-paren">(</span><em>bot_name: str</em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#delete.get_intents_to_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the intent names to delete from the DynamoDB tracker.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.</dd>
+<dt>Returns:</dt>
+<dd>A list of intent names to be deleted.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="delete.wipe_bot">
+<code class="descclassname">delete.</code><code class="descname">wipe_bot</code><span class="sig-paren">(</span><em>args: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#delete.wipe_bot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove bot from all of AWS.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>args: Dictionary mapping url.</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

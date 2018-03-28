@@ -29,8 +29,102 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="qnamaker-module">
-<h1>qnamaker module<a class="headerlink" href="#qnamaker-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-qnamaker">
+<span id="qnamaker-module"></span><h1>qnamaker module<a class="headerlink" href="#module-qnamaker" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="qnamaker.create_knowledge_base">
+<code class="descclassname">qnamaker.</code><code class="descname">create_knowledge_base</code><span class="sig-paren">(</span><em>faq_url: str</em>, <em>QNAMAKER_API_KEY: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#qnamaker.create_knowledge_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates knowledge base from FAQ URL using Azure QnAMaker at
+<a class="reference external" href="https://qnamaker.ai/">https://qnamaker.ai/</a>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>faq_url: A well-formed URL of a page containing an FAQ section.
+QNAMAKER_API_KEY: The API key for QnAMaker.</dd>
+<dt>Returns:</dt>
+<dd>The knowledge base ID.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.delete_knowledge_base">
+<code class="descclassname">qnamaker.</code><code class="descname">delete_knowledge_base</code><span class="sig-paren">(</span><em>kbId: str</em>, <em>QNAMAKER_API_KEY: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#qnamaker.delete_knowledge_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes knowledge base from Azure QnAMaker at <a class="reference external" href="https://qnamaker.ai/">https://qnamaker.ai/</a>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>kbId: The id of a knowledge base in Azure QnAMaker.
+QNAMAKER_API_KEY: The API key for QnAMaker.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.download_knowledge_base">
+<code class="descclassname">qnamaker.</code><code class="descname">download_knowledge_base</code><span class="sig-paren">(</span><em>kbId: str</em>, <em>QNAMAKER_API_KEY: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#qnamaker.download_knowledge_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads knowledge base from Azure QnAMaker at <a class="reference external" href="https://qnamaker.ai/">https://qnamaker.ai/</a>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>kbId: The id of a knowledge base in Azure QnAMaker.
+QNAMAKER_API_KEY: The API key from QnAMaker.</dd>
+<dt>Returns:</dt>
+<dd>The knowledge base as a list of intents..</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.generate_intents_from_knowledge_base">
+<code class="descclassname">qnamaker.</code><code class="descname">generate_intents_from_knowledge_base</code><span class="sig-paren">(</span><em>kb_tab_separated: str</em><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#qnamaker.generate_intents_from_knowledge_base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a list of intent objects from knowledge base as a tab-separated
+string.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>kb_tab_separated: A knowledge base as a tab-separated string.</dd>
+<dt>Returns:</dt>
+<dd>A list of intent objects that each contain an intent name, a list of
+sample utterances, and a response.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.get_API_key">
+<code class="descclassname">qnamaker.</code><code class="descname">get_API_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#qnamaker.get_API_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab QnAMaker API key from encrypted s3 object.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.get_stopwords">
+<code class="descclassname">qnamaker.</code><code class="descname">get_stopwords</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; list<a class="headerlink" href="#qnamaker.get_stopwords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve list of stopwords.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>A list of stopwords retrieved from stopwords.txt.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.question_to_intent_name">
+<code class="descclassname">qnamaker.</code><code class="descname">question_to_intent_name</code><span class="sig-paren">(</span><em>s: str</em>, <em>stopwords: list</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#qnamaker.question_to_intent_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a question string to an intent name.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>s: The question string.
+stopwords: The list of stopwords to remove from the string.</dd>
+<dt>Returns:</dt>
+<dd>A condensed version of the question text as an intent name.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="qnamaker.remove_invalid_punctuation">
+<code class="descclassname">qnamaker.</code><code class="descname">remove_invalid_punctuation</code><span class="sig-paren">(</span><em>s: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#qnamaker.remove_invalid_punctuation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes punctuation invalid by Lex intent rules, specifically any
+punctuation except apostrophes, underscores, and hyphens.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>s: any string, usually name of intent.</dd>
+<dt>Returns:</dt>
+<dd>The input string without invalid punctuation.</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

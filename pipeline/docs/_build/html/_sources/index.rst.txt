@@ -10,7 +10,13 @@ Welcome to octobot's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   source/delete.rst
+   source/lexinterface.rst
+   source/main.rst
    source/modules.rst
+   source/qnamaker.rst
+   source/status.rst
+   source/test.rst
 
 
 Indices and tables

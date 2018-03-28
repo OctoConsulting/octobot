@@ -29,8 +29,62 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="status-module">
-<h1>status module<a class="headerlink" href="#status-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-status">
+<span id="status-module"></span><h1>status module<a class="headerlink" href="#module-status" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="status.create_bot_stage_table">
+<code class="descclassname">status.</code><code class="descname">create_bot_stage_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#status.create_bot_stage_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create table for storing bot stages if not exists.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>True if created. False if already exists.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="status.delete_bot">
+<code class="descclassname">status.</code><code class="descname">delete_bot</code><span class="sig-paren">(</span><em>bot_name: str</em><span class="sig-paren">)</span><a class="headerlink" href="#status.delete_bot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes bot from DynamoDB tracker, but not Lex.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="status.get_bot_stage">
+<code class="descclassname">status.</code><code class="descname">get_bot_stage</code><span class="sig-paren">(</span><em>bot_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#status.get_bot_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current status of the bot in the DynamoDB tracker.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.</dd>
+</dl>
+<p>Returns:
+The status message stored in the DynamoDB table.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="status.update_bot_faqurl">
+<code class="descclassname">status.</code><code class="descname">update_bot_faqurl</code><span class="sig-paren">(</span><em>bot_name: str</em>, <em>new_faqurl: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#status.update_bot_faqurl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the url of the bot in the DynamoDB tracker.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.
+new_faqurl: The new url of the bot.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="status.update_bot_stage">
+<code class="descclassname">status.</code><code class="descname">update_bot_stage</code><span class="sig-paren">(</span><em>bot_name: str</em>, <em>new_stage: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#status.update_bot_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the status of the bot in the DynamoDB tracker.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.
+new_stage: The new status of the bot.</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 

@@ -29,8 +29,169 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="lexinterface-module">
-<h1>lexinterface module<a class="headerlink" href="#lexinterface-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-lexinterface">
+<span id="lexinterface-module"></span><h1>lexinterface module<a class="headerlink" href="#module-lexinterface" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="lexinterface.clean_intent_name">
+<code class="descclassname">lexinterface.</code><code class="descname">clean_intent_name</code><span class="sig-paren">(</span><em>intent: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#lexinterface.clean_intent_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean intent to make it fit the right length and character set.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>intent: The intent name string.</dd>
+<dt>Returns:</dt>
+<dd>The intent that meets Lex specifications.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.clean_utterance">
+<code class="descclassname">lexinterface.</code><code class="descname">clean_utterance</code><span class="sig-paren">(</span><em>utterance: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#lexinterface.clean_utterance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean utterance to make it fit the right length and character set.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>utterance: The utterance string.</dd>
+<dt>Returns:</dt>
+<dd>The utterance that meets Lex specifications.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.create_bot">
+<code class="descclassname">lexinterface.</code><code class="descname">create_bot</code><span class="sig-paren">(</span><em>bot_name: str</em>, <em>intents_name_version_list: list</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#lexinterface.create_bot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Lex bot with all specified intents attached.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">bot_name: name of bot to be created.
+intents_name_version_list: a list of intent objects where each intent</p>
+<blockquote class="last">
+<div>object defines the intent name and version.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.create_bot_alias">
+<code class="descclassname">lexinterface.</code><code class="descname">create_bot_alias</code><span class="sig-paren">(</span><em>bot_name: str</em>, <em>max_attempts: int = 80</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.create_bot_alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign the DEV alias to the bot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.
+max_attempts: The number of attempts to assign alias before giving up.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.create_bot_version">
+<code class="descclassname">lexinterface.</code><code class="descname">create_bot_version</code><span class="sig-paren">(</span><em>bot_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.create_bot_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish version of bot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: The name of the bot.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.create_dynamodb_table">
+<code class="descclassname">lexinterface.</code><code class="descname">create_dynamodb_table</code><span class="sig-paren">(</span><em>table_name: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#lexinterface.create_dynamodb_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a DynamoDB table for intents, with primary keys of intent and the
+version.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>table_name: name of the table unique to the FAQ.</dd>
+<dt>Returns:</dt>
+<dd>The response generated from the create table request.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.create_intent_versions">
+<code class="descclassname">lexinterface.</code><code class="descname">create_intent_versions</code><span class="sig-paren">(</span><em>intents: list</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.create_intent_versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Publish a version for each intent.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>intents: The list of intents with intentName defined for each intent.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.create_intents">
+<code class="descclassname">lexinterface.</code><code class="descname">create_intents</code><span class="sig-paren">(</span><em>bot_name: str</em>, <em>intents: list</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.create_intents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Lex intents from intent objects list. All intents have the same
+fulfillment activity code hook to the Lambda function LexResponder.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">bot_name: name of bot to be created.
+intents: a list of intent objects where each intent object defines the</p>
+<blockquote class="last">
+<div>intent name, a list sample utterances, and a response.</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.delete_bot">
+<code class="descclassname">lexinterface.</code><code class="descname">delete_bot</code><span class="sig-paren">(</span><em>bot_name: str</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.delete_bot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the defined bot alias and the bot itself.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: name of the bot to delete.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.delete_intents">
+<code class="descclassname">lexinterface.</code><code class="descname">delete_intents</code><span class="sig-paren">(</span><em>intent_names: list</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.delete_intents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all intents provided, normally associated with a bot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>intent_names: list of intent names, normally associated with a bot.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.iterate_batch_write_item">
+<code class="descclassname">lexinterface.</code><code class="descname">iterate_batch_write_item</code><span class="sig-paren">(</span><em>table_name: str</em>, <em>put_requests: list</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#lexinterface.iterate_batch_write_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Batch write items to table while handling more than 25 items.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>table_name: name of table to put items to.
+put_requests: list of put requests.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.put_request">
+<code class="descclassname">lexinterface.</code><code class="descname">put_request</code><span class="sig-paren">(</span><em>bot_name: str</em>, <em>intent: object</em><span class="sig-paren">)</span> &#x2192; object<a class="headerlink" href="#lexinterface.put_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap the bot name and intent information in a put request object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>bot_name: name of the bot.
+intent: intent object that includes at least the name and response.</dd>
+<dt>Returns:</dt>
+<dd>The put request object.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="lexinterface.wait_until_table_ready">
+<code class="descclassname">lexinterface.</code><code class="descname">wait_until_table_ready</code><span class="sig-paren">(</span><em>table_name: str</em>, <em>max_iterations: int = 10</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#lexinterface.wait_until_table_ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates when the DynamoDB table is ready.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">table_name: name of the table in DynamoDB.
+max_iterations: max number of tries, separated by 3 seconds, before</p>
+<blockquote class="last">
+<div>giving up and returning False.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>Returns True if table is ready. Returns False if the table is not ready</dt>
+<dd>after <cite>max_iterations</cite> number of checks, separated by 3 seconds.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
