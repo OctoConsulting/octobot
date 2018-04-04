@@ -48,7 +48,7 @@ def lambda_handler(event, context):
         'isBase64Encoded': 'false',
         'statusCode': 200,
         'headers': {
-            '           Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': '*'
         },
         'body': '{}'
     }
