@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 ddb_client = boto3.client('dynamodb')
 
+
 def bot_name_from_url(url: str) -> str:
     """Makes a unique bot name from the base url from the base url and the
     path url.
@@ -47,7 +48,7 @@ def lambda_handler(event, context):
         'isBase64Encoded': 'false',
         'statusCode': 200,
         'headers': {
-'           Access-Control-Allow-Origin': '*'
+            '           Access-Control-Allow-Origin': '*'
         },
         'body': '{}'
     }
@@ -58,10 +59,10 @@ def lambda_handler(event, context):
     if 'url' not in event['queryStringParameters']:
         response_payload['statusCode'] = '401'
         return response_payload
-        
+
     url = event['queryStringParameters']['url']
     bot_name = bot_name_from_url(url)
-        
+
     try:
         response_item = ddb_client.get_item(
             TableName='octochat_bots',
@@ -81,8 +82,7 @@ def lambda_handler(event, context):
             })
         else:
             response_payload['statusCode'] = 400
-    except:
+    except BaseException:
         response_payload['statusCode'] = 400
-        
-    return response_payload
 
+    return response_payload

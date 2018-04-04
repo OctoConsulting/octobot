@@ -97,6 +97,20 @@ def put_request(bot_name: str, intent: object) -> object:
         }
     }
 
+def iterate_batch_write_item(table_name: str, put_requests: list) -> None:
+    """Batch write items to table while handling more than 25 items.
+    
+    Args:
+        table_name: name of table to put items to.
+        put_requests: list of put requests.
+    """
+    num_put_requests = len(put_requests)
+    for n in range(0, num_put_requests, 25):
+        ddb_client.batch_write_item(
+            RequestItems={
+                table_name: put_requests[n:n+25]
+            }
+        )
 
 def lambda_handler(event, context):
     bot_name = event['bot_name']
@@ -110,10 +124,6 @@ def lambda_handler(event, context):
 
     # TODO: make version reflect the correct version
     put_requests = [put_request(bot_name, intent) for intent in intents]
-    batch_write_item_response = ddb_client.batch_write_item(
-        RequestItems={
-            table_name: put_requests
-        }
-    )
+    iterate_batch_write_item(table_name, put_requests)
 
-    return str(batch_write_item_response)
+    return True

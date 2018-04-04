@@ -3,6 +3,7 @@ import json
 
 ssm_client = boto3.client('ssm')
 
+
 def lambda_handler(event, context):
     print(event)
     response_package = {
@@ -20,7 +21,7 @@ def lambda_handler(event, context):
         return response_package
 
     faq_url = event['queryStringParameters']['url']
-    
+
     try:
         ssm_client.send_command(
             Targets=[
@@ -34,7 +35,7 @@ def lambda_handler(event, context):
             Parameters={
                 'workingDirectory': [''],
                 'executionTimeout': ['3600'],
-                'commands': ['cd /home/ec2-user/octobot/pipeline/',
+                'commands': ['cd /home/ec2-user/octobot/pipeline/scripts/',
                              'python3 delete.py %s' % (faq_url)]
             },
             OutputS3BucketName='octochat-processor',
@@ -45,5 +46,3 @@ def lambda_handler(event, context):
         print(e)
         response_package['statusCode'] = 402
     return response_package
-
-

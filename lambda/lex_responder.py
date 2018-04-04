@@ -25,7 +25,7 @@ def lambda_handler(event, context):
     response_text = 'Sorry, look up failed.'
     try:
         response_text = str(get_item_response['Item']['response']['S'])
-    except:
+    except BaseException:
         pass
 
     return_package = {

@@ -5,6 +5,7 @@ from urllib.parse import urlparse
 
 ssm_client = boto3.client('ssm')
 
+
 def bot_name_from_url(url: str) -> str:
     """Makes a unique bot name from the base url from the base url and the
     path url.
@@ -47,7 +48,7 @@ def lambda_handler(event, context):
         'isBase64Encoded': 'false',
         'statusCode': 200,
         'headers': {
-'           Access-Control-Allow-Origin': '*'
+            '           Access-Control-Allow-Origin': '*'
         },
         'body': '{}'
     }
@@ -65,27 +66,27 @@ def lambda_handler(event, context):
     try:
         ssm_client.send_command(
             # InstanceIds=['i-07e71733dc7f00495'],
-        	Targets=[
-        		{
-        			'Key': 'tag:Name',
-        			'Values': ['octochat-processor-1']
-        		}
-        	],
-        	DocumentName='AWS-RunShellScript',
-        	TimeoutSeconds=1000,
-        	Parameters={
-        		'workingDirectory': [''],
-        		'executionTimeout': ['3600'],
-        		'commands': ['cd /home/ec2-user/octobot/pipeline/',
-        		             'python3 main.py %s' % (url)]
-        	},
-        	OutputS3BucketName='octochat-processor',
-        	MaxConcurrency='50',
-        	MaxErrors='0'
+            Targets=[
+                {
+                    'Key': 'tag:Name',
+                    'Values': ['octochat-processor-1']
+                }
+            ],
+            DocumentName='AWS-RunShellScript',
+            TimeoutSeconds=1000,
+            Parameters={
+                'workingDirectory': [''],
+                'executionTimeout': ['3600'],
+                'commands': ['cd /home/ec2-user/octobot/pipeline/scripts/',
+                             'python3 main.py %s' % (url)]
+            },
+            OutputS3BucketName='octochat-processor',
+            MaxConcurrency='50',
+            MaxErrors='0'
         )
         response_payload['body'] = json.dumps({
             'bot_name': bot_name
         })
-    except:
+    except BaseException:
         response_payload['statusCode'] = 402
     return response_payload
