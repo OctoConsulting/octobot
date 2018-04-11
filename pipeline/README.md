@@ -6,6 +6,7 @@ Below includes documentation and dicussion for
 2. Lambda
 3. IAM
 4. Architecture
+5. To-dos
 
 
 
@@ -222,3 +223,7 @@ Every Lambda function or EC2 instance requires permissions to interact with othe
 ## 4. Lambda vs. EC2
 
 Here we will briefly discuss the rationale behind the choices of architecture design. Originally, we had the entire pipeline broken into smaller functions and set up as chained Lambda functions. Unfortunately, because of the size of some FAQ pages, some Lambda functions would time out, making that architecture not scalable. Although the serverless structure could still potentially work if the Lambda functions were broken down into smaller functions, it was easier to shift to a server setup with EC2. Currently, interactions with the API invoke small Lambda functions that use Systems Manager to run scripts on the EC2 instance.
+
+
+## 5. To-dos
+* Definitely should not have created a separate DynamoDB table for each new bot. Instead, there should just be one big table that contains all the intents for all bots with an extra column that indicates the bot. This will cut out a solid 30 to 60 seconds off the creation pipeline that were dedicated to just creating a new DynamoDB table.
